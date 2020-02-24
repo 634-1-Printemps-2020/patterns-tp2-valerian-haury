@@ -15,6 +15,8 @@ public class Game {
 
     public Game() {
         history = new HashMap<>();
+        this.coin = Coin.getInstance();
+        this.rules = Rules.getInstance();
     }
 
     /**
@@ -23,7 +25,8 @@ public class Game {
      * @param player le nouveau joueur
      */
     public void addPlayer(Player player) {
-      // TODO: Votre code ici
+      // TODO: Votre code ici - DONE
+        history.put(player, new ArrayList<>());
     }
 
     /**
@@ -31,6 +34,15 @@ public class Game {
      */
     public void play() {
       // TODO: Votre code ici
+        List<CoinState> currentCointState;
+        for (Player player: history.keySet()) {
+            currentCointState = new ArrayList<>();
+            while(!rules.checkWin(currentCointState)) {
+                coin.throwCoin();
+                currentCointState.add(coin.getState());
+            }
+            history.put(player,currentCointState);
+        }
     }
 
     /**
@@ -40,7 +52,35 @@ public class Game {
      */
     public Statistics getStatistics() {
       // TODO: Votre code ici
-      return null;
+
+        // Le nombre le plus petit de lancers pour avoir gagné une partie
+        int fewerMovesToWin = history.get(history.keySet().toArray()[0]).size();
+
+        for (Player player: history.keySet()) {
+            int currentFewerMovesToWin = history.get(player).size();
+            if(currentFewerMovesToWin < fewerMovesToWin)
+                fewerMovesToWin = currentFewerMovesToWin;
+        }
+
+        // Le nombre le plus grand de lancers pour avoir gagné une partie
+        int mostMovesToWin = history.get(history.keySet().toArray()[0]).size();;
+
+        for (Player player: history.keySet()) {
+            int currentMostMoveToWin = history.get(player).size();
+            if(currentMostMoveToWin > mostMovesToWin)
+                mostMovesToWin = currentMostMoveToWin;
+        }
+
+        // Nombre total de lancers pour tous les joueurs
+        int totalNumberMoves = 0;
+        for (Player player: history.keySet()) {
+            totalNumberMoves += history.get(player).size();
+        }
+
+        // Le nombre moyen de lancers pour gagner une partie
+        float averageToWin = totalNumberMoves / (float)history.keySet().size();
+
+      return new Statistics(averageToWin, fewerMovesToWin, mostMovesToWin, totalNumberMoves);
     }
 
     /**
@@ -49,8 +89,8 @@ public class Game {
      * @return Map contenant chaque joueur et la liste des ses lancers
      */
     public Map<Player, List<CoinState>> getHistory() {
-      // TODO: Votre code ici
-      return null;
+      // TODO: Votre code ici- DONE
+      return this.history;
     }
 
 
@@ -61,8 +101,8 @@ public class Game {
      * @return la liste des lancers d'un joueur
      */
     public List<CoinState> getSpecificHistory(Player player) {
-      // TODO: Votre code ici
-      return null;
+      // TODO: Votre code ici- DONE
+      return this.history.get(player);
     }
 
 }
